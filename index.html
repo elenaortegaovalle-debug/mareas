@@ -268,7 +268,7 @@ const foto=(id,w)=>'https://drive.google.com/thumbnail?id='+encodeURIComponent(i
 function bonita(f){const[y,m,d]=f.split('-').map(Number);return DIAS[new Date(y,m-1,d).getDay()]+' '+d+' de '+MESES[m-1];}
 function aviso(t){const e=$('aviso');e.textContent=t;e.classList.add('ver');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('ver'),3200);}
 function ocupado(b){document.querySelectorAll('button').forEach(x=>x.disabled=b);}
-const API='https://script.google.com/macros/s/AKfycbzhgbcven4sxT6kszqTmS4PDw3isiS4R46tLxV6xgTOz38ZOL2GYw4SGKDG92GVd2neQQ/exec';
+const API='https://script.google.com/macros/s/AKfycbxAqu-wAUWxJA88u3WZhus8Klt5mJO72sRa4b9JMzWd2-v2wbX3_vLoUPq71b0wWIdh/exec';
 async function run(accion,...args){
   let r;
   try{ r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({accion,args})}); }
