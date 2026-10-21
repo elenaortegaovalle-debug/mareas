@@ -1,5 +1,5 @@
 // Mareas de Amigas: guarda la app en el celular para que abra al instante
-const VERSION = 'mareas-v1';
+const VERSION = 'mareas-v2';
 const ARCHIVOS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
