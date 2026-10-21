@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mareas de Amigas</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#A9DDEB">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mareas">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mareas de Amigas</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --fondo:#EEFBF8; --fondo2:#FFF6EA; --tarjeta:rgba(255,255,255,.92); --cielo1:#A9DDEB; --cielo2:#C4E9F2;
+  --agua:#C4E9F2; --agua2:#8FD0E2; --hondo:#4E9DB4; --menta:#CFF1E1; --menta2:#96D9B9;
+  --lila:#E8DFFA; --lila2:#B9A6E6; --coral:#FFD9D1; --coral2:#FF9F92; --arena:#FFF6EA;
+  --texto:#46607A; --suave:#7F98AA; --blanco:#fff; --sol:#FFE7B0;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --fondo:#13263A; --fondo2:#1A2D44; --tarjeta:rgba(30,52,74,.92); --cielo1:#1F4A66; --cielo2:#2A5C7A;
+  --agua:#2F5872; --agua2:#4F8FAD; --hondo:#9ED8EA; --menta:#24584A; --menta2:#4FA587;
+  --lila:#3A3560; --lila2:#8A7AC8; --coral:#5A3A3E; --coral2:#E88A7E; --arena:#1E3349;
+  --texto:#DCEBF3; --suave:#9DB6C6; --blanco:#24405A; --sol:#F3DCA0;}}
+:root[data-theme="dark"]{
+  --fondo:#13263A; --fondo2:#1A2D44; --tarjeta:rgba(30,52,74,.92); --cielo1:#1F4A66; --cielo2:#2A5C7A;
+  --agua:#2F5872; --agua2:#4F8FAD; --hondo:#9ED8EA; --menta:#24584A; --menta2:#4FA587;
+  --lila:#3A3560; --lila2:#8A7AC8; --coral:#5A3A3E; --coral2:#E88A7E; --arena:#1E3349;
+  --texto:#DCEBF3; --suave:#9DB6C6; --blanco:#24405A; --sol:#F3DCA0;}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--texto);
+  background:linear-gradient(180deg,var(--fondo) 0%,var(--fondo) 40%,var(--fondo2) 100%);background-color:var(--fondo);min-height:100%;overflow-x:hidden}
+h1,h2,h3{font-family:'Fredoka','Nunito',system-ui,sans-serif;font-weight:600;margin:0}
+button{font-family:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--lila2);outline-offset:2px}
+
+.mar{position:relative;padding:34px 20px 84px;text-align:center;background:linear-gradient(180deg,var(--cielo1),var(--cielo2));overflow:hidden}
+.mar h1{font-size:clamp(28px,8vw,36px);color:#fff;text-shadow:0 3px 0 rgba(78,157,180,.35)}
+.mar p{margin:8px auto 0;max-width:30ch;color:#fff;font-weight:700;line-height:1.4}
+.sol{position:absolute;top:14px;right:22px;width:44px;height:44px;border-radius:50%;background:var(--sol);box-shadow:0 0 0 8px rgba(255,231,176,.35)}
+.ola{position:absolute;left:0;width:200%;height:70px;bottom:-2px}
+.ola path{fill:var(--fondo)}
+.ola.a{animation:vaiven 9s ease-in-out infinite alternate;opacity:.5}
+.ola.b{animation:vaiven 13s ease-in-out infinite alternate-reverse}
+@keyframes vaiven{to{transform:translateX(-25%)}}
+.burbujas{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.burbujas span{position:absolute;bottom:-40px;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.9),rgba(196,233,242,.3));border:1px solid rgba(143,208,226,.5);animation:subir linear infinite}
+@keyframes subir{to{transform:translateY(-115vh) translateX(24px);opacity:0}}
+@media (prefers-reduced-motion:reduce){.ola,.burbujas span{animation:none}.burbujas{display:none}}
+
+main{position:relative;z-index:1;max-width:540px;margin:-34px auto 0;padding:0 14px 70px}
+.bloque{background:var(--tarjeta);border-radius:28px;padding:20px 18px;margin-bottom:18px;box-shadow:0 8px 24px rgba(78,157,180,.13)}
+.bloque > h2{font-size:20px;color:var(--hondo);margin-bottom:14px}
+.estado{font-size:13px;font-weight:700;color:var(--suave);text-align:center;margin:-6px 0 14px}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:2px solid var(--agua);background:var(--blanco);color:var(--texto);padding:8px 14px;border-radius:999px;font-weight:800;font-size:14px;cursor:pointer;transition:transform .15s}
+.chip.on{background:var(--hondo);border-color:var(--hondo);color:var(--fondo);transform:scale(1.06)}
+
+.mes{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.mes h2{font-size:20px;color:var(--hondo)}
+.mes button{border:none;background:var(--lila);width:40px;height:40px;border-radius:50%;font-size:20px;color:var(--texto);cursor:pointer}
+.grilla{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;text-align:center}
+.dsem{font-size:12px;font-weight:800;color:var(--suave)}
+.dia{aspect-ratio:1;border:none;border-radius:40% 40% 46% 46%;background:var(--fondo);color:var(--texto);font-weight:800;font-size:14px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;padding:0}
+.dia.vacio{background:none;cursor:default}
+.dia.pasado{opacity:.35}
+.dia.hoy{box-shadow:inset 0 0 0 2px var(--agua2)}
+.dia.votando{background:var(--coral)}
+.dia.confirmado{background:var(--menta)}
+.dia small{font-size:12px}
+.leyenda{display:flex;gap:16px;justify-content:center;margin-top:12px;font-size:13px;color:var(--suave);font-weight:700}
+
+label{display:block;font-size:13px;font-weight:800;margin:12px 0 5px}
+input,select{width:100%;padding:11px 13px;border-radius:16px;border:2px solid var(--agua);background:var(--blanco);font:700 16px 'Nunito',system-ui,sans-serif;color:var(--texto);min-width:0}
+.par{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.lanzar{width:100%;margin-top:18px;padding:14px;border:none;border-radius:999px;background:var(--coral2);color:#fff;font:600 17px 'Fredoka',system-ui,sans-serif;cursor:pointer;box-shadow:0 5px 0 #E07F72}
+.lanzar:active{transform:translateY(3px);box-shadow:0 2px 0 #E07F72}
+button:disabled{opacity:.6;cursor:wait}
+
+.prop{background:var(--arena);border-radius:22px;padding:16px;margin-bottom:12px;border:2px dashed var(--coral2);transition:box-shadow .3s}
+.prop.ok{background:var(--fondo);border:2px solid var(--menta2)}
+.prop.brilla{box-shadow:0 0 0 4px var(--lila2)}
+.prop h3{font-size:18px}
+.info{font-size:14px;color:var(--suave);margin:6px 0 12px;line-height:1.55;font-weight:700}
+.peces{display:flex;gap:8px;flex-wrap:wrap}
+.pez{display:flex;flex-direction:column;align-items:center;gap:3px;width:52px;font-size:11px;font-weight:800;color:var(--suave);text-align:center}
+.pez b{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--blanco);border:2px dashed var(--agua)}
+.pez.si b{background:var(--menta);border:2px solid var(--menta2)}
+.pez.no b{background:var(--lila);border:2px solid var(--lila2);filter:grayscale(.5)}
+.nivel{height:12px;border-radius:99px;background:var(--blanco);overflow:hidden;margin:12px 0 6px}
+.nivel i{display:block;height:100%;background:linear-gradient(90deg,var(--agua2),var(--menta2));border-radius:99px;transition:width .5s}
+.cuenta{font-size:13px;font-weight:800;color:var(--hondo)}
+.votar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.votar button{border:2px solid transparent;padding:11px;border-radius:999px;font-weight:800;font-size:14px;cursor:pointer}
+.b-si{background:var(--menta);color:var(--texto)}
+.b-no{background:var(--lila);color:var(--texto)}
+.votar .marcado{border-color:var(--hondo)}
+.agendar{display:inline-block;margin-top:10px;background:var(--hondo);color:var(--fondo);padding:10px 16px;border-radius:999px;font-weight:800;font-size:14px;text-decoration:none}
+.quitar{background:none;border:none;color:var(--suave);font-weight:700;font-size:12px;cursor:pointer;margin-top:8px;text-decoration:underline}
+.nada{text-align:center;color:var(--suave);font-weight:700;padding:6px 0;line-height:1.5}
+
+.aviso{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,160px);background:var(--hondo);color:var(--fondo);padding:12px 22px;border-radius:999px;font-weight:800;transition:transform .3s;z-index:9;max-width:92%;text-align:center}
+.aviso.ver{transform:translate(-50%,0)}
+
+.subir{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border:2px dashed var(--agua2);border-radius:22px;background:var(--fondo);color:var(--hondo);font:600 16px 'Fredoka',system-ui,sans-serif;cursor:pointer}
+.subir input{display:none}
+.album{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:14px}
+.foto{position:relative;aspect-ratio:1;border:none;padding:0;border-radius:16px;overflow:hidden;cursor:pointer;background:var(--agua)}
+.foto img{width:100%;height:100%;object-fit:cover;display:block}
+.foto span{position:absolute;left:4px;bottom:4px;font-size:14px;background:rgba(255,255,255,.8);border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+.visor{position:fixed;inset:0;z-index:20;background:rgba(19,38,58,.88);display:none;flex-direction:column;align-items:center;justify-content:center;padding:calc(20px + env(safe-area-inset-top,0px)) 16px calc(20px + env(safe-area-inset-bottom,0px))}
+.visor.ver{display:flex}
+.visor img{max-width:100%;max-height:70vh;border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.visor p{color:#fff;font-weight:700;text-align:center;margin:12px 0 8px;line-height:1.5}
+.visor .fila{display:flex;gap:10px}
+.visor button{border:none;border-radius:999px;padding:10px 18px;font-weight:800;font-size:14px;cursor:pointer;background:#fff;color:#46607A}
+.progreso{font-size:13px;font-weight:700;color:var(--suave);text-align:center;margin-top:8px;min-height:18px}
+.permiso{display:none;background:var(--coral);border:2px solid var(--coral2);border-radius:22px;padding:14px 16px;margin-bottom:18px;font-weight:700;line-height:1.5;font-size:14px}
+.permiso.ver{display:block}
+.permiso b{font-family:'Fredoka',system-ui,sans-serif;font-weight:600;font-size:16px;display:block;margin-bottom:4px}
+.verDrive{display:block;text-align:center;margin-top:12px;color:var(--hondo);font-weight:800;font-size:14px}
+.dia.feriado{background:#FFEDBF}
+.dia.cumple{background:#FBD5E2}
+.fecha-item{display:flex;align-items:center;gap:10px;padding:10px;border-radius:16px;margin-bottom:8px}
+.fecha-item.cumple{background:#FBE6EE;color:#7A3550}
+.fecha-item.feriado{background:#FFF1D2;color:#6E4A10}
+.fecha-item .fi{font-size:22px}
+.fecha-item div{flex:1;min-width:0}
+.fecha-item b{display:block;font-size:14px}
+.fecha-item small{font-size:12px;font-weight:700;opacity:.85}
+.fecha-item button{border:none;background:#fff;color:inherit;border-radius:999px;padding:7px 12px;font-weight:800;font-size:12px;cursor:pointer}
+.as-datos{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.as-datos div{background:var(--menta);border-radius:16px;padding:10px 12px}
+.as-datos small{display:block;font-size:12px;font-weight:700}
+.as-datos b{font-family:'Fredoka',sans-serif;font-weight:600;font-size:17px}
+.revela{background:#FBE6EE;border:2px dashed #EE9CBA;border-radius:20px;padding:14px;text-align:center;color:#7A3550}
+.revela small{font-weight:700;font-size:13px;display:block;margin-bottom:8px}
+.revela input{text-align:center;letter-spacing:8px;font-size:20px;max-width:160px;margin:0 auto;display:block}
+.quien-es{font-family:'Fredoka',sans-serif;font-size:26px;font-weight:600;margin:4px 0}
+.sub{font-size:16px;color:var(--hondo);margin:18px 0 8px}
+.deseos{margin:0 0 10px;padding-left:20px;line-height:1.8;font-weight:700}
+.admin{margin-top:16px;background:var(--lila);border-radius:18px;padding:12px}
+.admin summary{font-weight:800;cursor:pointer;color:#5B4A8F}
+.agregar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.agregar a{display:block;text-align:center;padding:10px 6px;border-radius:999px;background:var(--hondo);color:#fff;font-weight:800;font-size:13px;text-decoration:none}
+.agregar a+a{background:var(--lila2)}
+.mar{padding-top:calc(34px + env(safe-area-inset-top,0px))}
+main{padding-bottom:calc(70px + env(safe-area-inset-bottom,0px))}
+.instalar{display:none;background:#fff;border-radius:22px;padding:14px 16px;margin-bottom:18px;box-shadow:0 8px 24px rgba(78,157,180,.13);font-weight:700;line-height:1.5;font-size:14px}
+.instalar.ver{display:block}
+.instalar b{font-family:'Fredoka',sans-serif;font-weight:600;font-size:16px;color:var(--hondo);display:block;margin-bottom:4px}
+.instalar .fila-b{display:flex;gap:8px;margin-top:10px}
+.instalar button{border:none;border-radius:999px;padding:9px 14px;font-weight:800;cursor:pointer}
+.instalar .si{background:var(--coral2);color:#fff}
+.instalar .no{background:var(--fondo);color:var(--texto)}
+</style>
+</head>
+<body>
+<div class="burbujas" id="burbujas"></div>
+
+<header class="mar">
+  <div class="sol"></div>
+  <h1>Mareas de Amigas</h1>
+  <p>Propón un día, las demás votan y si gana queda en el calendario de todas 🐚</p>
+  <svg class="ola a" viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,50 C180,90 360,10 540,45 C720,80 900,15 1080,45 C1260,75 1350,30 1440,40 L1440,100 L0,100 Z"/></svg>
+  <svg class="ola b" viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,60 C200,30 400,90 620,58 C840,26 1040,88 1240,56 C1340,42 1400,52 1440,58 L1440,100 L0,100 Z"/></svg>
+</header>
+
+<main>
+  <div class="estado" id="estado">Cargando la marea…</div>
+  <div class="instalar" id="instalar" role="region" aria-label="Instalar app">
+    <b>Instala Mareas en tu celular 🐚</b>
+    <span id="instalarTxt"></span>
+    <div class="fila-b"><button class="si" id="instalarBtn" style="display:none">Instalar</button><button class="no" onclick="cerrarInstalar()">Ahora no</button></div>
+  </div>
+
+  <section class="bloque">
+    <h2>¿Quién eres?</h2>
+    <div class="chips" id="quien"></div>
+  </section>
+
+  <section class="bloque">
+    <div class="mes">
+      <button onclick="mover(-1)" aria-label="Mes anterior">‹</button>
+      <h2 id="tituloMes"></h2>
+      <button onclick="mover(1)" aria-label="Mes siguiente">›</button>
+    </div>
+    <div class="grilla" id="cal"></div>
+    <div class="leyenda" style="flex-wrap:wrap;gap:8px 14px"><span>🐠 en votación</span><span>🐚 agendado</span><span>🎂 cumpleaños</span><span>🎉 feriado</span></div>
+  </section>
+
+  <section class="bloque">
+    <h2>Próximas fechas</h2>
+    <div id="proximas"></div>
+  </section>
+
+  <section class="bloque" id="formulario">
+    <h2>Proponer un día</h2>
+    <label for="fTitulo">¿Qué hacemos?</label>
+    <input id="fTitulo" placeholder="Picnic en la playa" maxlength="60">
+    <div class="par">
+      <div><label for="fFecha">Día</label><input type="date" id="fFecha"></div>
+      <div><label for="fHora">Hora</label><input type="time" id="fHora" value="19:00"></div>
+    </div>
+    <div class="par">
+      <div><label for="fDur">Duración</label>
+        <select id="fDur"><option value="1">1 hora</option><option value="2" selected>2 horas</option><option value="3">3 horas</option><option value="4">4 horas</option><option value="6">6 horas</option></select></div>
+      <div><label for="fLugar">Lugar</label><input id="fLugar" placeholder="Café, playa…" maxlength="80"></div>
+    </div>
+    <button class="lanzar" onclick="proponer()">Proponer día 🫧</button>
+  </section>
+
+  <section class="bloque">
+    <h2>Por votar</h2>
+    <div id="pendientes"></div>
+  </section>
+
+  <section class="bloque">
+    <h2>Agendadas</h2>
+    <div id="confirmadas"></div>
+  </section>
+
+  <section class="bloque">
+    <h2>Amigo secreto 🎁</h2>
+    <div id="amigo"></div>
+  </section>
+
+  <section class="bloque">
+    <h2>Álbum de mareas 📸</h2>
+    <label class="subir">Subir fotos desde la galería 🫧
+      <input type="file" id="fFotos" accept="image/*" multiple onchange="subirFotos(this.files)">
+    </label>
+    <div class="progreso" id="progreso"></div>
+    <a class="verDrive" id="verDrive" href="#" target="_blank" rel="noopener" style="display:none">Ver álbum completo en Google Drive</a>
+    <div class="album" id="album"></div>
+  </section>
+</main>
+
+<div class="visor" id="visor" onclick="if(event.target===this)cerrarVisor()">
+  <img id="visorImg" alt="">
+  <p id="visorTxt"></p>
+  <div class="fila"><button onclick="cerrarVisor()">Cerrar</button><button id="visorBorrar" onclick="borrarFoto()">Borrar foto</button></div>
+</div>
+<div class="aviso" id="aviso" role="status"></div>
+
+<script>
+const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const DIAS=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+let DATA={participantes:[],propuestas:[],fotos:[],deseos:[],feriados:[],amigo:{},pins:[],necesarios:3}, YO=null, FOTO_ABIERTA=null, REVELADO=null, PROX=[];
+const VISTA=new Date(); VISTA.setDate(1);
+try{ YO=localStorage.getItem('mareas_yo_email'); }catch(e){}
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const HOY=iso(new Date());
+const orden=(a,b)=>(a.fecha+a.hora).localeCompare(b.fecha+b.hora);
+const persona=e=>DATA.participantes.find(p=>p.email===e)||{nombre:'Alguien',emoji:'🐟'};
+const foto=(id,w)=>'https://drive.google.com/thumbnail?id='+encodeURIComponent(id)+'&sz=w'+w;
+function bonita(f){const[y,m,d]=f.split('-').map(Number);return DIAS[new Date(y,m-1,d).getDay()]+' '+d+' de '+MESES[m-1];}
+function aviso(t){const e=$('aviso');e.textContent=t;e.classList.add('ver');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('ver'),3200);}
+function ocupado(b){document.querySelectorAll('button').forEach(x=>x.disabled=b);}
+const API='https://script.google.com/macros/s/AKfycbzhgbcven4sxT6kszqTmS4PDw3isiS4R46tLxV6xgTOz38ZOL2GYw4SGKDG92GVd2neQQ/exec';
+async function run(accion,...args){
+  let r;
+  try{ r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({accion,args})}); }
+  catch(e){ throw new Error('Sin conexión. Revisa tu internet e inténtalo de nuevo.'); }
+  let j; try{ j=await r.json(); }catch(e){ throw new Error('El servidor no respondió bien. Inténtalo de nuevo.'); }
+  if(!j.ok) throw new Error(j.error||'Algo salió mal.');
+  return j.data;
+}
+async function accion(fn,args,msg){
+  ocupado(true);
+  try{ DATA=await run(fn,...args); render(); try{localStorage.setItem('mareas_datos',JSON.stringify(DATA))}catch(_){} if(msg) aviso(typeof msg==='function'?msg():msg); return true; }
+  catch(e){ aviso((e&&e.message)||'No se pudo guardar. Inténtalo de nuevo.'); return false; }
+  finally{ ocupado(false); }
+}
+
+/* ---------- Render ---------- */
+function render(){ renderQuien(); renderCal(); renderProximas(); renderListas(); renderAmigo(); renderAlbum(); }
+function renderQuien(){
+  if(YO && !DATA.participantes.some(p=>p.email===YO)) YO=null;
+  $('quien').innerHTML=DATA.participantes.map(p=>`<button class="chip ${p.email===YO?'on':''}" onclick="elegir('${p.email}')">${p.emoji} ${esc(p.nombre)}</button>`).join('');
+}
+function elegir(e){ YO=e; REVELADO=null; try{localStorage.setItem('mareas_yo_email',e)}catch(_){} render(); aviso('Hola, '+persona(e).nombre+' '+persona(e).emoji); }
+
+function renderCal(){
+  const y=VISTA.getFullYear(),m=VISTA.getMonth();
+  $('tituloMes').textContent=MESES[m]+' '+y;
+  const salto=(new Date(y,m,1).getDay()+6)%7,total=new Date(y,m+1,0).getDate();
+  let h=['L','M','M','J','V','S','D'].map(d=>`<div class="dsem">${d}</div>`).join('');
+  for(let i=0;i<salto;i++)h+='<div class="dia vacio"></div>';
+  for(let d=1;d<=total;d++){
+    const f=iso(new Date(y,m,d)),del=DATA.propuestas.filter(p=>p.fecha===f);
+    const conf=del.some(p=>p.estado==='confirmada'),vot=del.some(p=>p.estado==='pendiente');
+    const esp=especiales(f),cum=esp.some(x=>x.tipo==='cumple'),fer=esp.some(x=>x.tipo==='feriado');
+    const cls=['dia',f<HOY?'pasado':'',f===HOY?'hoy':'',conf?'confirmado':vot?'votando':cum?'cumple':fer?'feriado':''].join(' ');
+    const ic=(conf?'🐚':vot?'🐠':'')+(cum?'🎂':'')+(fer&&!cum?'🎉':'');
+    h+=`<button class="${cls}" onclick="tocarDia('${f}')" aria-label="${bonita(f)}${esp.map(x=>', '+esc(x.nombre)).join('')}">${d}<small>${ic.slice(0,4)}</small></button>`;
+  }
+  $('cal').innerHTML=h;
+}
+function mover(n){VISTA.setMonth(VISTA.getMonth()+n);renderCal();}
+function tocarDia(f){
+  if(f<HOY){aviso('Ese día ya pasó.');return;}
+  const p=DATA.propuestas.find(x=>x.fecha===f&&x.estado!=='descartada'),el=p&&$('p-'+p.id);
+  if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.add('brilla');setTimeout(()=>el.classList.remove('brilla'),1800);return;}
+  const esp=especiales(f);
+  if(esp.length){ aviso(esp.map(x=>x.tipo==='feriado'?'🎉 Feriado: '+x.nombre:'🎂 '+x.nombre).join(' · ')); if(!$('fTitulo').value) $('fTitulo').value=tituloPara(esp[0]); }
+  $('fFecha').value=f;$('formulario').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function cumplesDe(y){ return DATA.participantes.filter(p=>p.cumple).map(p=>({fecha:y+'-'+p.cumple,nombre:'Cumple de '+p.nombre,tipo:'cumple'})); }
+function especiales(f){ return [...cumplesDe(f.slice(0,4)).filter(c=>c.fecha===f), ...(DATA.feriados||[]).filter(x=>x.fecha===f).map(x=>({fecha:f,nombre:x.nombre,tipo:'feriado'}))]; }
+function tituloPara(x){ return x.tipo==='cumple'?x.nombre+' 🎂':'Juntarnos en '+x.nombre+' 🎉'; }
+function cuanto(f){ const[y,m,d]=f.split('-').map(Number),h=new Date();h.setHours(0,0,0,0);const n=Math.round((new Date(y,m-1,d)-h)/86400000);return n===0?'¡hoy!':n===1?'mañana':'en '+n+' días'; }
+function renderProximas(){
+  const y=new Date().getFullYear(),lim=new Date();lim.setDate(lim.getDate()+120);const limIso=iso(lim);
+  PROX=[...cumplesDe(y),...cumplesDe(y+1),...(DATA.feriados||[]).map(x=>({fecha:x.fecha,nombre:x.nombre,tipo:'feriado'}))]
+    .filter(x=>x.fecha>=HOY&&x.fecha<=limIso).sort((a,b)=>a.fecha.localeCompare(b.fecha)).slice(0,6);
+  $('proximas').innerHTML=PROX.length?PROX.map((x,i)=>`<div class="fecha-item ${x.tipo}"><span class="fi">${x.tipo==='cumple'?'🎂':'🎉'}</span>
+    <div><b>${esc(x.tipo==='feriado'?'Feriado: '+x.nombre:x.nombre)}</b><small>${bonita(x.fecha)}, ${cuanto(x.fecha)}</small></div>
+    <button onclick="proponerDesde(${i})">Proponer</button></div>`).join(''):'<div class="nada">No hay cumpleaños ni feriados en los próximos meses.</div>';
+}
+function proponerDesde(i){ const x=PROX[i]; $('fFecha').value=x.fecha; $('fTitulo').value=tituloPara(x); $('formulario').scrollIntoView({behavior:'smooth',block:'start'}); }
+
+function renderListas(){
+  const n=DATA.participantes.length,meta=DATA.necesarios;
+  const pend=DATA.propuestas.filter(p=>p.estado==='pendiente'&&p.fecha>=HOY).sort(orden);
+  const conf=DATA.propuestas.filter(p=>p.estado==='confirmada'&&p.fecha>=HOY).sort(orden);
+  $('pendientes').innerHTML=pend.length?pend.map(p=>tarjeta(p,n,meta)).join(''):'<div class="nada">No hay nada por votar.<br>Toca un día del calendario para proponer uno 🫧</div>';
+  $('confirmadas').innerHTML=conf.length?conf.map(p=>`<div class="prop ok"><h3>🐚 ${esc(p.titulo)}</h3>
+    <div class="info" style="margin-bottom:0">📅 ${bonita(p.fecha)}, ${esc(p.hora)} h${p.lugar?'<br>📍 '+esc(p.lugar):''}</div>
+    <div class="agregar"><a href="${linkGoogle(p)}" target="_blank" rel="noopener">📅 Google Calendar</a><a href="${DATA.url}?ics=${encodeURIComponent(p.id)}" target="_blank" rel="noopener">🍎 iPhone / Outlook</a></div></div>`).join('')
+    :'<div class="nada">Cuando una propuesta gane, aparecerá aquí ⚓</div>';
+}
+function linkGoogle(p){
+  const[y,m,d]=p.fecha.split('-').map(Number),[hh,mm]=p.hora.split(':').map(Number);
+  const ini=new Date(y,m-1,d,hh,mm),fin=new Date(ini.getTime()+(Number(p.duracion)||2)*3600000);
+  const z=x=>x.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
+  const q=new URLSearchParams({action:'TEMPLATE',text:'🐚 '+p.titulo,dates:z(ini)+'/'+z(fin),location:p.lugar||'',details:'¡Ganó la marea! 🌊 Mareas de Amigas'});
+  return 'https://calendar.google.com/calendar/render?'+q.toString();
+}
+function tarjeta(p,n,meta){
+  const si=Object.values(p.votos).filter(v=>v==='si').length,faltan=Math.max(meta-si,0),mio=YO?p.votos[YO]:null,a=persona(p.autor);
+  const peces=DATA.participantes.map(g=>`<div class="pez ${p.votos[g.email]||''}"><b>${g.emoji}</b>${esc(g.nombre)}</div>`).join('');
+  return `<div class="prop" id="p-${p.id}"><h3>${esc(p.titulo)}</h3>
+    <div class="info">📅 ${bonita(p.fecha)}, ${esc(p.hora)} h (${esc(p.duracion)} h)${p.lugar?'<br>📍 '+esc(p.lugar):''}<br>Lo propuso ${a.emoji} ${esc(a.nombre)}</div>
+    <div class="peces">${peces}</div>
+    <div class="nivel"><i style="width:${Math.min(si/meta,1)*100}%"></i></div>
+    <div class="cuenta">${si} de ${n} se suman. ${faltan?(faltan===1?'Falta 1 voto':'Faltan '+faltan+' votos')+' para agendar.':''}</div>
+    ${YO?`<div class="votar"><button class="b-si ${mio==='si'?'marcado':''}" onclick="votar('${p.id}','si')">Me sumo 🐠</button><button class="b-no ${mio==='no'?'marcado':''}" onclick="votar('${p.id}','no')">No puedo 🦀</button></div>
+      ${YO===p.autor?`<button class="quitar" onclick="retirar('${p.id}')">Retirar propuesta</button>`:''}`
+      :'<div class="info" style="margin:10px 0 0">Elige quién eres para votar.</div>'}</div>`;
+}
+
+/* ---------- Acciones ---------- */
+function proponer(){
+  if(!YO){aviso('Primero elige quién eres.');$('quien').scrollIntoView({behavior:'smooth'});return;}
+  const p={autor:YO,titulo:$('fTitulo').value.trim(),fecha:$('fFecha').value,hora:$('fHora').value,duracion:$('fDur').value,lugar:$('fLugar').value.trim()};
+  if(!p.fecha||!p.hora){aviso('Falta el día o la hora.');return;}
+  if(p.fecha<HOY){aviso('Elige un día que no haya pasado.');return;}
+  accion('proponer',[p],'Día propuesto. Les avisamos por correo 💌').then(ok=>{ if(ok){$('fTitulo').value='';$('fLugar').value='';$('fFecha').value='';} });
+}
+function votar(id,v){
+  accion('votar',[id,YO,v],()=>{const p=DATA.propuestas.find(x=>x.id===id);return p&&p.estado==='confirmada'?'¡Ganó! Quedó agendado para todas 🐚':v==='si'?'Te sumaste 🐠':'Anotado que no puedes 🦀';});
+}
+function retirar(id){ if(confirm('¿Retirar esta propuesta?')) accion('retirar',[id,YO],'Propuesta retirada'); }
+
+/* ---------- Amigo secreto ---------- */
+function bonitaCorta(f){ if(!f) return '—'; const[y,m,d]=f.split('-').map(Number); return DIAS[new Date(y,m-1,d).getDay()].slice(0,3)+' '+d+' '+MESES[m-1].slice(0,3); }
+function renderAmigo(){
+  const a=DATA.amigo||{},yo=YO?persona(YO):null,soyAdmin=!!(yo&&yo.admin),tienePin=!!(YO&&(DATA.pins||[]).includes(YO));
+  let h='';
+  if(a.sorteadoEl){
+    h+=`<div class="as-datos"><div><small>Presupuesto</small><b>${esc(a.presupuesto||'Libre')}</b></div><div><small>Intercambio</small><b>${bonitaCorta(a.fecha)}</b></div></div>`;
+    if(!YO) h+='<div class="nada">Elige quién eres para ver tu amigo secreto.</div>';
+    else if(REVELADO&&REVELADO.yo===YO){
+      const r=persona(REVELADO.receptor),ds=DATA.deseos.filter(d=>d.persona===REVELADO.receptor);
+      h+=`<div class="revela"><small>Te toca regalarle a…</small><div class="quien-es">${r.emoji} ${esc(r.nombre)}</div><button class="quitar" onclick="REVELADO=null;renderAmigo()">Ocultar</button></div>
+        <h3 class="sub">Lista de deseos de ${esc(r.nombre)}</h3>`+(ds.length?'<ul class="deseos">'+ds.map(d=>`<li>${esc(d.texto)}</li>`).join('')+'</ul>':'<div class="nada">Todavía no agrega ideas.</div>');
+    } else {
+      h+=`<div class="revela"><small>${tienePin?'Ingresa tu PIN para ver a quién le regalas':'Crea un PIN de 4 números. Lo usarás cada vez que quieras ver tu amigo secreto.'}</small>
+        <input id="pinVer" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" aria-label="PIN">
+        <button class="lanzar" onclick="revelar()">Ver a quién le regalo 🎁</button></div>`;
+    }
+  } else h+='<div class="nada">Aún no se hace el sorteo 🎁'+(soyAdmin?'':'<br>Elena lo hará cuando estén todas.')+'</div>';
+  if(soyAdmin){
+    h+=`<details class="admin" ${a.sorteadoEl?'':'open'}><summary>${a.sorteadoEl?'Volver a sortear':'Configurar y sortear'}</summary>
+      <label for="asPres">Presupuesto</label><input id="asPres" value="${esc(a.presupuesto||'')}" placeholder="$15.000" maxlength="30">
+      <label for="asFecha">Fecha del intercambio</label><input id="asFecha" type="date" value="${esc(a.fecha||'')}">
+      <label for="asPin">${tienePin?'Tu PIN':'Crea tu PIN (4 números)'}</label><input id="asPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••">
+      ${a.sorteadoEl?'<div class="info">Si vuelves a sortear, cambian todas las parejas.</div>':''}
+      <button class="lanzar" onclick="sortear()">Sortear 🎁</button></details>`;
+  }
+  if(YO){
+    const mios=DATA.deseos.filter(d=>d.persona===YO);
+    h+=`<h3 class="sub">Mi lista de deseos</h3>`+(mios.length?'<ul class="deseos">'+mios.map(d=>`<li>${esc(d.texto)} <button class="quitar" onclick="borrarDeseo('${d.id}')">quitar</button></li>`).join('')+'</ul>':'')+
+      `<input id="nuevoDeseo" maxlength="80" placeholder="Agrega una idea de regalo…" aria-label="Idea de regalo"><button class="lanzar" onclick="agregarDeseo()">Guardar idea ✨</button>`;
+  }
+  $('amigo').innerHTML=h;
+}
+async function revelar(){
+  const pin=$('pinVer').value.trim();
+  if(!/^\d{4}$/.test(pin)){aviso('El PIN debe tener 4 números.');return;}
+  ocupado(true);
+  try{ const r=await run('revelar',YO,pin); REVELADO={yo:YO,receptor:r.receptor}; if(r.nuevo&&!DATA.pins.includes(YO)) DATA.pins.push(YO); renderAmigo(); aviso(r.nuevo?'PIN creado. ¡No lo olvides! 🤫':'🤫 Solo tú lo ves'); }
+  catch(e){ aviso((e&&e.message)||'No se pudo revisar el PIN.'); }
+  finally{ ocupado(false); }
+}
+function sortear(){
+  const pres=$('asPres').value.trim(),fecha=$('asFecha').value,pin=$('asPin').value.trim();
+  if(!fecha){aviso('Elige la fecha del intercambio.');return;}
+  if(!/^\d{4}$/.test(pin)){aviso('El PIN debe tener 4 números.');return;}
+  if(DATA.amigo&&DATA.amigo.sorteadoEl&&!confirm('¿Volver a sortear? Cambian todas las parejas.'))return;
+  REVELADO=null; accion('sortear',[YO,pin,pres,fecha],'¡Sorteo listo! Les avisamos por correo 🎁');
+}
+function agregarDeseo(){ const t=$('nuevoDeseo').value.trim(); if(!t){aviso('Escribe una idea de regalo.');return;} accion('agregarDeseo',[YO,t],'Idea guardada ✨'); }
+function borrarDeseo(id){ accion('borrarDeseo',[YO,id],'Idea quitada'); }
+
+/* ---------- Álbum ---------- */
+function renderAlbum(){
+  $('album').innerHTML=DATA.fotos.length?DATA.fotos.map(f=>`<button class="foto" onclick="abrirFoto('${f.id}')" aria-label="Foto de ${esc(persona(f.email).nombre)}"><img src="${foto(f.id,300)}" alt="" loading="lazy" referrerpolicy="no-referrer"><span>${persona(f.email).emoji}</span></button>`).join('')
+    :'<div class="nada" style="grid-column:1/-1">Sube la primera foto de una juntita 🐚</div>';
+}
+function leerImagen(file){return new Promise((ok,mal)=>{const u=URL.createObjectURL(file),img=new Image();img.onload=()=>{URL.revokeObjectURL(u);ok(img)};img.onerror=()=>{URL.revokeObjectURL(u);mal(new Error('No se pudo leer una foto.'))};img.src=u;});}
+async function preparar(file){
+  const img=await leerImagen(file),r=Math.min(1,2048/Math.max(img.width,img.height)),c=document.createElement('canvas');
+  c.width=Math.round(img.width*r);c.height=Math.round(img.height*r);
+  c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+  return c.toDataURL('image/jpeg',0.88);
+}
+async function subirFotos(files){
+  if(!YO){aviso('Primero elige quién eres.');$('fFotos').value='';return;}
+  const lista=[...files].slice(0,15);let listas=0;ocupado(true);
+  for(const f of lista){
+    $('progreso').textContent=`Subiendo ${listas+1} de ${lista.length}…`;
+    try{ DATA=await run('subirFoto',YO,await preparar(f)); listas++; renderAlbum(); }
+    catch(e){ aviso((e&&e.message)||'No se pudo subir una foto.'); }
+  }
+  ocupado(false);$('progreso').textContent='';$('fFotos').value='';render();
+  if(listas) aviso(listas===1?'Foto subida 📸':listas+' fotos subidas 📸');
+  if(files.length>15) aviso('Se subieron las primeras 15. Sube el resto en otra tanda.');
+}
+function abrirFoto(id){
+  const f=DATA.fotos.find(x=>x.id===id);if(!f)return;FOTO_ABIERTA=f;
+  $('visorImg').src=foto(f.id,1600);
+  const d=new Date(f.creada||Date.now());
+  $('visorTxt').textContent=`${persona(f.email).emoji} Subida por ${persona(f.email).nombre} el ${d.getDate()} de ${MESES[d.getMonth()]}`;
+  $('visorBorrar').style.display=YO===f.email?'':'none';
+  $('visor').classList.add('ver');
+}
+function cerrarVisor(){$('visor').classList.remove('ver');FOTO_ABIERTA=null;}
+async function borrarFoto(){
+  if(!FOTO_ABIERTA||!confirm('¿Borrar esta foto del álbum?'))return;
+  const id=FOTO_ABIERTA.id; cerrarVisor(); accion('borrarFoto',[id,YO],'Foto borrada');
+}
+
+/* ---------- Arranque ---------- */
+(function(){let h='';for(let i=0;i<12;i++){const s=8+Math.random()*22;h+=`<span style="left:${Math.random()*100}%;width:${s}px;height:${s}px;animation-duration:${10+Math.random()*14}s;animation-delay:${-Math.random()*20}s"></span>`;}$('burbujas').innerHTML=h;})();
+$('fFecha').min=HOY;
+render();
+function mostrarAlbumLink(){ if(DATA.album){$('verDrive').href=DATA.album;$('verDrive').style.display='';} }
+try{ const g=JSON.parse(localStorage.getItem('mareas_datos')||'null'); if(g&&g.participantes){ DATA=g; render(); mostrarAlbumLink(); $('estado').textContent='Actualizando…'; } }catch(e){}
+let cargando=false, ultima=0;
+function actualizar(){
+  if(cargando) return; cargando=true;
+  run('getData').then(d=>{
+    DATA=d; render(); mostrarAlbumLink(); ultima=Date.now();
+    $('estado').textContent='🌊 Al día';
+    try{ localStorage.setItem('mareas_datos',JSON.stringify(d)); }catch(e){}
+  }).catch(e=>{$('estado').textContent=(e&&e.message)||'No se pudo cargar. Inténtalo de nuevo.';})
+    .finally(()=>{cargando=false;});
+}
+actualizar();
+// al volver a la app, trae lo nuevo
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible' && Date.now()-ultima>30000){ $('estado').textContent='Actualizando…'; actualizar(); } });
+
+/* ---------- Instalar en el celular ---------- */
+let pedidoInstalar=null;
+const instalada=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+function cerrarInstalar(){ $('instalar').classList.remove('ver'); try{localStorage.setItem('mareas_no_instalar',String(Date.now()))}catch(e){} }
+function mostrarInstalar(txt,boton){
+  let ocultoHace=0; try{ ocultoHace=Date.now()-Number(localStorage.getItem('mareas_no_instalar')||0); }catch(e){}
+  if(instalada || ocultoHace<3*86400000) return;
+  $('instalarTxt').innerHTML=txt; $('instalarBtn').style.display=boton?'':'none'; $('instalar').classList.add('ver');
+}
+window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); pedidoInstalar=e; mostrarInstalar('Queda como una app más, con su ícono en la pantalla de inicio.',true); });
+$('instalarBtn').onclick=async()=>{ if(!pedidoInstalar) return; pedidoInstalar.prompt(); await pedidoInstalar.userChoice; pedidoInstalar=null; $('instalar').classList.remove('ver'); };
+if(/iphone|ipad|ipod/i.test(navigator.userAgent) && !instalada){
+  mostrarInstalar('En Safari, toca <b style="display:inline;font-size:inherit">Compartir</b> (el cuadrito con la flecha ↑) y luego <b style="display:inline;font-size:inherit">Agregar a inicio</b>.',false);
+}
+if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{})); }
+</script>
+</body>
+</html>
